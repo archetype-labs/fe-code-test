@@ -8,13 +8,21 @@ interface RatingQuestionProps {
   question: Question;
   value: number;
   onChange: (value: number) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }
 
-export function RatingQuestion({ question, value = 0, onChange }: RatingQuestionProps) {
+export function RatingQuestion({
+  question,
+  value = 0,
+  onChange,
+  onBlur,
+  onFocus,
+}: RatingQuestionProps) {
   const maxRating = 5;
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2" tabIndex={0} onBlur={onBlur} onFocus={onFocus}>
       {Array.from({ length: maxRating }).map((_, index) => {
         const starNumber = index + 1;
         return (
@@ -40,4 +48,4 @@ export function RatingQuestion({ question, value = 0, onChange }: RatingQuestion
       })}
     </div>
   );
-} 
+}

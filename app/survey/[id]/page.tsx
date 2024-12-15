@@ -1,20 +1,28 @@
 "use client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
+import { PageLayout } from "@/components/survey/page-layout";
 import { Button } from "@/components/ui/button";
 import { QuestionDisplay } from "@/components/survey/question-display";
-import { generateShareableLink, getSurveyById, saveSurveyResponse } from "@/lib/survey";
+import {
+  generateShareableLink,
+  getSurveyById,
+  saveSurveyResponse,
+} from "@/lib/survey";
 import { Survey } from "@/types/survey";
 import { Share2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { LoadingLayout } from "@/components/survey/loading-layout";
+import { NoSurveyLayout } from "@/components/survey/no-survey-layout";
 
 export default function SurveyPreview() {
   const params = useParams();
   const [survey, setSurvey] = useState<Survey | undefined>();
   const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,11 +30,34 @@ export default function SurveyPreview() {
       const loadedSurvey = getSurveyById(params.id as string);
       setSurvey(loadedSurvey);
     }
+    setIsLoading(false);
   }, [params.id]);
 
-  if (!survey) {
-    return <div>Survey not found</div>;
+  if (isLoading) {
+    return <LoadingLayout />;
   }
+
+  if (!survey) {
+    return <NoSurveyLayout />;
+  }
+
+  const isValid =
+    survey.questions
+      .filter((q) => q.required)
+      .filter((q) => {
+        const val = answers[q.id];
+
+        if (val == null || val === "") {
+          // If val is null/undefined or empty string, it's unanswered
+          return true;
+        }
+        if (Array.isArray(val) && val.length === 0) {
+          // If it's an empty array, it's unanswered
+          return true;
+        }
+
+        return false;
+      }).length === 0;
 
   const handleShare = () => {
     const link = generateShareableLink(survey!.id);
@@ -35,21 +66,18 @@ export default function SurveyPreview() {
   };
 
   const handleSubmit = () => {
-    // Validate required questions
-    const unansweredRequired = survey.questions
-      .filter(q => q.required)
-      .filter(q => !answers[q.id]);
-
-    if (unansweredRequired.length > 0) {
+    if (!isValid) {
       toast.error("Please answer all required questions");
       return;
     }
 
     // Format answers for submission
-    const formattedAnswers = Object.entries(answers).map(([questionId, value]) => ({
-      questionId,
-      value,
-    }));
+    const formattedAnswers = Object.entries(answers).map(
+      ([questionId, value]) => ({
+        questionId,
+        value,
+      })
+    );
 
     // Create and save response
     const response = {
@@ -65,36 +93,41 @@ export default function SurveyPreview() {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{survey.title}</h1>
-            <p className="text-muted-foreground">{survey.description}</p>
-          </div>
-          <Button onClick={handleShare}>
-            <Share2 className="mr-2 h-4 w-4" />
-            Share
-          </Button>
-        </div>
-
-        <div className="space-y-6">
+    <PageLayout
+      title={survey.title}
+      description={survey.description}
+      actions={
+        <Button onClick={handleShare}>
+          <Share2 className="mr-2 h-4 w-4" />
+          Share
+        </Button>
+      }
+      content={
+        <div className="flex flex-col gap-6">
           {survey.questions.map((question) => (
             <QuestionDisplay
               key={question.id}
               question={question}
               value={answers[question.id]}
-              onChange={(value) =>
-                setAnswers({ ...answers, [question.id]: value })
-              }
+              onChange={(value) => {
+                setAnswers({ ...answers, [question.id]: value });
+              }}
             />
           ))}
         </div>
-
-        <div className="mt-8 flex justify-end">
-          <Button onClick={handleSubmit}>Submit Survey</Button>
+      }
+      footer={
+        <div className="flex items-center gap-4">
+          {!isValid && (
+            <p className="text-sm text-muted-foreground italic">
+              Please complete all required fields.
+            </p>
+          )}
+          <Button disabled={!isValid} onClick={handleSubmit}>
+            Submit Survey
+          </Button>
         </div>
-      </div>
-    </div>
+      }
+    />
   );
 }

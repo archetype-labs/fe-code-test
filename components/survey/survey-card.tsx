@@ -27,21 +27,50 @@ export function SurveyCard({ survey, onDelete }: SurveyCardProps) {
 
   return (
     <Card className="p-6">
-      <h2 className="text-xl font-semibold mb-2">{survey.title}</h2>
-      <p className="text-muted-foreground mb-4">{survey.description}</p>
+      <div className="flex items-top justify-between mb-4">
+        <div>
+          <h2 className="text-l font-semibold mb-1">{survey.title}</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            {survey.description}
+          </p>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => router.push(`/edit/${survey.id}`)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="icon">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  survey and all its data.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => onDelete(survey.id)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </div>
       <div className="flex gap-2 flex-wrap">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => router.push(`/edit/${survey.id}`)}
-        >
-          <Pencil className="h-4 w-4 mr-2" />
-          Edit
-        </Button>
-        <Button
-          size="sm"
-          onClick={() => router.push(`/survey/${survey.id}`)}
-        >
+        <Button size="sm" onClick={() => router.push(`/survey/${survey.id}`)}>
           <PlayCircle className="h-4 w-4 mr-2" />
           Preview
         </Button>
@@ -53,32 +82,6 @@ export function SurveyCard({ survey, onDelete }: SurveyCardProps) {
           <ListChecks className="h-4 w-4 mr-2" />
           Responses
         </Button>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive" size="sm">
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                survey and all its data.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => onDelete(survey.id)}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </Card>
   );

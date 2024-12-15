@@ -1,18 +1,21 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { PageLayout } from "@/components/survey/page-layout";
 import { Card } from "@/components/ui/card";
+
+import noResponsesIllustration from "@/assets/images/no-responses-illustration.jpg";
 import { getSurveyById, getSurveyResponses } from "@/lib/survey";
 import { Survey, SurveyResponse } from "@/types/survey";
-import { ArrowLeft } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LoadingLayout } from "@/components/survey/loading-layout";
+import { NoSurveyLayout } from "@/components/survey/no-survey-layout";
 
 export default function SurveyResponses() {
   const params = useParams();
-  const router = useRouter();
   const [survey, setSurvey] = useState<Survey>();
   const [responses, setResponses] = useState<SurveyResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (params.id) {
@@ -22,11 +25,16 @@ export default function SurveyResponses() {
         const surveyResponses = getSurveyResponses(loadedSurvey.id);
         setResponses(surveyResponses);
       }
+      setIsLoading(false);
     }
   }, [params.id]);
 
+  if (isLoading) {
+    return <LoadingLayout />;
+  }
+
   if (!survey) {
-    return <div>Survey not found</div>;
+    return <NoSurveyLayout />;
   }
 
   const formatAnswer = (questionId: string, value: string | string[]) => {
@@ -45,28 +53,26 @@ export default function SurveyResponses() {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="outline" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{survey.title} - Responses</h1>
-            <p className="text-muted-foreground">
-              {responses.length} total {responses.length === 1 ? "response" : "responses"}
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-6">
+    <PageLayout
+      title={`${survey.title}`}
+      description={`${responses.length} total ${
+        responses.length === 1 ? "response" : "responses"
+      }`}
+      content={
+        <div className="flex flex-col gap-6">
           {responses.length === 0 ? (
-            <Card className="p-6">
-              <p className="text-muted-foreground text-center">
-                No responses yet
-              </p>
-            </Card>
+            <>
+              <Card className="p-6">
+                <p className="text-muted-foreground text-center">
+                  No responses yet…
+                </p>
+              </Card>
+
+              <img
+                src={noResponsesIllustration.src}
+                className="w-2/4 mx-auto relative -bottom-12"
+              />
+            </>
           ) : (
             responses.map((response) => (
               <Card key={response.id} className="p-6">
@@ -101,7 +107,8 @@ export default function SurveyResponses() {
             ))
           )}
         </div>
-      </div>
-    </div>
+      }
+      goBack
+    />
   );
-} 
+}
