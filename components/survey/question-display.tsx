@@ -11,6 +11,7 @@ import { MultiselectQuestion } from "./question-types/multiselect-question";
 import { DateQuestion } from "./question-types/date-question";
 import { RatingQuestion } from "./question-types/rating-question";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface QuestionDisplayProps {
   question: Question;
@@ -18,9 +19,25 @@ interface QuestionDisplayProps {
   onChange: (value: any) => void;
 }
 
-export function QuestionDisplay({ question, value, onChange }: QuestionDisplayProps) {
-  const isAnswered = value !== undefined && value !== "" && (!Array.isArray(value) || value.length > 0);
-  const showError = question.required && !isAnswered;
+export function QuestionDisplay({
+  question,
+  value,
+  onChange,
+}: QuestionDisplayProps) {
+  const [touched, setTouched] = useState(false);
+  const [focused, setFocused] = useState(false);
+
+  const isAnswered =
+    value !== undefined &&
+    value !== "" &&
+    (!Array.isArray(value) || value.length > 0);
+  const showError = question.required && !isAnswered && touched;
+
+  const handleFocus = () => setFocused(true);
+  const handleBlur = () => {
+    setFocused(false);
+    setTouched(true);
+  };
 
   return (
     <Card className={cn("p-6", showError && "border-destructive")}>
@@ -34,6 +51,8 @@ export function QuestionDisplay({ question, value, onChange }: QuestionDisplayPr
           question={question}
           value={value}
           onChange={onChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       )}
 
@@ -42,6 +61,8 @@ export function QuestionDisplay({ question, value, onChange }: QuestionDisplayPr
           question={question}
           value={value}
           onChange={onChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       )}
 
@@ -50,6 +71,8 @@ export function QuestionDisplay({ question, value, onChange }: QuestionDisplayPr
           question={question}
           value={value || []}
           onChange={onChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       )}
 
@@ -58,6 +81,8 @@ export function QuestionDisplay({ question, value, onChange }: QuestionDisplayPr
           question={question}
           value={value}
           onChange={onChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       )}
 
@@ -66,6 +91,8 @@ export function QuestionDisplay({ question, value, onChange }: QuestionDisplayPr
           question={question}
           value={value || []}
           onChange={onChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       )}
 
@@ -74,6 +101,8 @@ export function QuestionDisplay({ question, value, onChange }: QuestionDisplayPr
           question={question}
           value={value}
           onChange={onChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       )}
 
@@ -82,11 +111,15 @@ export function QuestionDisplay({ question, value, onChange }: QuestionDisplayPr
           question={question}
           value={value}
           onChange={onChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       )}
 
       {showError && (
-        <p className="text-sm text-destructive mt-2">This question is required</p>
+        <p className="text-sm text-destructive mt-2">
+          This question is required
+        </p>
       )}
     </Card>
   );

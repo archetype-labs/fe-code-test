@@ -2,7 +2,11 @@
 
 import { Calendar } from "@/components/ui/calendar";
 import { Question } from "@/types/survey";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import { format, parseISO } from "date-fns";
@@ -13,16 +17,25 @@ interface DateQuestionProps {
   question: Question;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }
 
-export function DateQuestion({ question, value, onChange }: DateQuestionProps) {
+export function DateQuestion({
+  question,
+  value,
+  onChange,
+  onBlur,
+  onFocus,
+}: DateQuestionProps) {
   const [date, setDate] = useState<Date | undefined>(
     value ? parseISO(value) : undefined
   );
 
   const handleSelect = (newDate: Date | undefined) => {
     setDate(newDate);
-    onChange(newDate ? newDate.toISOString() : '');
+    onChange(newDate ? newDate.toISOString() : "");
+    onBlur && onBlur();
   };
 
   return (
@@ -34,6 +47,7 @@ export function DateQuestion({ question, value, onChange }: DateQuestionProps) {
             "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
+          onFocus={onFocus}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {date ? format(date, "PPP") : "Pick a date"}
@@ -49,4 +63,4 @@ export function DateQuestion({ question, value, onChange }: DateQuestionProps) {
       </PopoverContent>
     </Popover>
   );
-} 
+}

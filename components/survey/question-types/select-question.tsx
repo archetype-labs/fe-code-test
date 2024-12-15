@@ -13,12 +13,20 @@ interface SelectQuestionProps {
   question: Question;
   value: string | string[];
   onChange: (value: string | string[]) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }
 
-export function SelectQuestion({ question, value, onChange }: SelectQuestionProps) {
+export function SelectQuestion({
+  question,
+  value,
+  onChange,
+  onBlur,
+  onFocus,
+}: SelectQuestionProps) {
   return (
     <Select value={value as string} onValueChange={onChange}>
-      <SelectTrigger>
+      <SelectTrigger onBlur={onBlur} onFocus={onFocus}>
         <SelectValue placeholder="Select an option" />
       </SelectTrigger>
       <SelectContent>

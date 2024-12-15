@@ -8,13 +8,27 @@ interface CheckboxQuestionProps {
   question: Question;
   value: string[];
   onChange: (value: string[]) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }
 
-export function CheckboxQuestion({ question, value = [], onChange }: CheckboxQuestionProps) {
+export function CheckboxQuestion({
+  question,
+  value = [],
+  onChange,
+  onBlur,
+  onFocus,
+}: CheckboxQuestionProps) {
   return (
     <div className="space-y-2">
       {question.options?.map((option) => (
-        <div key={option.id} className="flex items-center space-x-2">
+        <div
+          key={option.id}
+          className="flex items-center space-x-2"
+          tabIndex={0}
+          onBlur={onBlur}
+          onFocus={onFocus}
+        >
           <Checkbox
             id={option.id}
             checked={value.includes(option.id)}

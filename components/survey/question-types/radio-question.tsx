@@ -8,14 +8,31 @@ interface RadioQuestionProps {
   question: Question;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }
 
-export function RadioQuestion({ question, value, onChange }: RadioQuestionProps) {
+export function RadioQuestion({
+  question,
+  value,
+  onChange,
+  onBlur,
+  onFocus,
+}: RadioQuestionProps) {
   return (
-    <RadioGroup value={value} onValueChange={onChange} required={question.required}>
+    <RadioGroup
+      value={value}
+      onValueChange={onChange}
+      required={question.required}
+    >
       {question.options?.map((option) => (
         <div key={option.id} className="flex items-center space-x-2">
-          <RadioGroupItem value={option.id} id={option.id} />
+          <RadioGroupItem
+            value={option.id}
+            id={option.id}
+            onBlur={onBlur}
+            onFocus={onFocus}
+          />
           <Label htmlFor={option.id}>{option.text}</Label>
         </div>
       ))}

@@ -16,12 +16,16 @@ interface MultiselectQuestionProps {
   question: Question;
   value: string[];
   onChange: (value: string[]) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }
 
 export function MultiselectQuestion({
   question,
   value = [],
   onChange,
+  onBlur,
+  onFocus,
 }: MultiselectQuestionProps) {
   const handleSelect = (optionId: string) => {
     if (value.includes(optionId)) {
@@ -52,14 +56,15 @@ export function MultiselectQuestion({
           </Badge>
         ))}
       </div>
-      <Select
-        value=""
-        onValueChange={handleSelect}
-      >
-        <SelectTrigger className={cn(
-          "w-full",
-          selectedOptions?.length ? "border-dashed" : ""
-        )}>
+      <Select value="" onValueChange={handleSelect}>
+        <SelectTrigger
+          className={cn(
+            "w-full",
+            selectedOptions?.length ? "border-dashed" : ""
+          )}
+          onBlur={onBlur}
+          onFocus={onFocus}
+        >
           <SelectValue placeholder="Select options..." />
         </SelectTrigger>
         <SelectContent>
